@@ -32,6 +32,18 @@
 %define dir_services systemd
 %define dir_tmpfiles %{nil}
 
+%if 0%{?fedora} >= 31
+    %define with_oca_java_prebuilt 1
+    %define scons            scons-3
+    #TODO: gemfile lock
+
+    # don't mangle shebangs (e.g., fix /usr/bin/env ruby -> /usr/bin/ruby)
+    %global __brp_mangle_shebangs_exclude_from ^\/var\/lib\/one\/remotes\/
+
+    # don't generate automatic requirements from bower components
+    %global __requires_exclude_from ^\/usr\/lib\/one\/sunstone\/public\/bower_components\/.*$
+%endif
+
 %if 0%{?rhel} == 8
     %define with_oca_java_prebuilt 1
     %define scons            scons-3
@@ -104,7 +116,7 @@ BuildRequires: pkgconfig
 BuildRequires: ruby
 BuildRequires: sqlite-devel
 BuildRequires: systemd-devel
-%if 0%{?rhel} == 8
+%if 0%{?rhel} == 8 || 0%{?fedora}
 BuildRequires: python3-rpm-macros
 BuildRequires: python3-scons
 BuildRequires: /usr/bin/pathfix.py
@@ -166,7 +178,7 @@ Requires: wget
 Requires: curl
 Requires: rsync
 Requires: iputils
-%if 0%{?rhel} == 8
+%if 0%{?rhel} == 8 || 0%{?fedora}
 Requires: zeromq >= 4, zeromq < 5
 %endif
 %if 0%{?rhel} == 7
@@ -244,7 +256,7 @@ Ruby gems dependencies for OpenNebula.
 Summary: Provides the OpenNebula Python libraries
 Group: System
 BuildArch: noarch
-%if 0%{?rhel} >= 8
+%if 0%{?rhel} >= 8 || 0%{?fedora}
 Requires: python2
 BuildRequires: python2-devel
 BuildRequires: python2-setuptools
@@ -286,7 +298,7 @@ Requires: %{name}-ruby = %{version}
 %if %{with_rubygems}
 Requires: %{name}-rubygems = %{version}
 %endif
-%if 0%{?rhel} == 8
+%if 0%{?rhel} == 8 || 0%{?fedora}
 Requires: python3
 Requires: python3-numpy
 %endif
@@ -398,7 +410,7 @@ https://raw.githubusercontent.com/OpenNebula/one/master/LICENSE.addons
 Summary: Java interface to OpenNebula Cloud API
 Group:   System
 BuildArch: noarch
-%if 0%{?rhel} == 8
+%if 0%{?rhel} == 8 || 0%{?fedora}
 # no build dependencies available
 #BuildRequires: java-11-openjdk-devel
 %endif
@@ -609,7 +621,7 @@ make install3 ROOT=%{buildroot}
 %endif
 cd -
 
-%if 0%{?rhel} == 8
+%if 0%{?rhel} == 8 || 0%{?fedora}
 # fix ambiguous Python shebangs
 pathfix.py -pni "%{__python3} %{py3_shbang_opts}" %{buildroot}/usr/lib/one/sunstone/public/bower_components/no-vnc/utils/*.py
 pathfix.py -pni "%{__python3} %{py3_shbang_opts}" %{buildroot}/usr/share/one/websockify/websockify/websocketproxy.py

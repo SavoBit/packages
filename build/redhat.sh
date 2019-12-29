@@ -8,12 +8,19 @@ DISTRO=${DISTRO%.*}
 
 if [ "${DISTRO}" = 'centos7' ]; then
     MOCK_CFG='epel-7-x86_64'
+    MOCK_PARAMS=''
     DIST_TAG='el7'
     GEMFILE_LOCK='CentOS7'
 elif [ "${DISTRO}" = 'centos8' ]; then
     MOCK_CFG='epel-8-x86_64'
+    MOCK_PARAMS=''
     DIST_TAG='el8'
     GEMFILE_LOCK='CentOS8'
+elif [ "${DISTRO}" = 'fedora31' ]; then
+    MOCK_CFG='fedora-31-x86_64'
+    MOCK_PARAMS='--use-bootstrap-image'
+    DIST_TAG='fc31'
+    GEMFILE_LOCK='Fedora31'
 else
     echo "ERROR: Invalid target '${DISTRO}'" >&2
     exit 1
@@ -26,7 +33,7 @@ cd "$(dirname "$0")"
 URL="$1"
 PKG_VERSION=${2:-1}
 
-SPEC="${DISTRO}.spec"
+SPEC='opennebula.spec'
 BUILD_DIR=$(mktemp -d)
 BUILD_DIR_SPKG=$(mktemp -d)
 PACKAGES_DIR="${PWD}"
@@ -97,8 +104,8 @@ if [[ "${BUILD_COMPONENTS}" =~ rubygems ]]; then
     MOCK_DIR_GEMS=$(mktemp -d)
 
     # build Ruby gems
-    mock -r "${MOCK_CFG}" --bootstrap-chroot --init
-    mock -r "${MOCK_CFG}" --bootstrap-chroot --install yum
+    mock -r "${MOCK_CFG}" "${MOCK_PARAMS}" --bootstrap-chroot --init
+    mock -r "${MOCK_CFG}" "${MOCK_PARAMS}" --bootstrap-chroot --install yum
 
     _MOCK_BIND_MOUNTS="[ \
 ('${PACKAGES_DIR}',   '/data/packages'), \
@@ -107,6 +114,7 @@ if [[ "${BUILD_COMPONENTS}" =~ rubygems ]]; then
 ]"
 
     mock -r "${MOCK_CFG}" \
+        "${MOCK_PARAMS}" \
         --bootstrap-chroot \
         --enable-network \
         --enable-plugin=bind_mount \
@@ -153,12 +161,13 @@ m4 -D_VERSION_="${VERSION}" \
 _BUILD_COMPONENTS_LC=${BUILD_COMPONENTS,,}
 _WITH_COMPONENTS=${_BUILD_COMPONENTS_LC:+ --with ${_BUILD_COMPONENTS_LC//[[:space:]]/ --with }}
 
-mock -r "${MOCK_CFG}" --bootstrap-chroot --init
+mock -r "${MOCK_CFG}" "${MOCK_PARAMS}" --bootstrap-chroot --init
 
 # build source package
 echo '***** Building source package' >&2
 MOCK_DIR_SPKG=$(mktemp -d)
 mock -r "${MOCK_CFG}" -v \
+    "${MOCK_PARAMS}" \
     --bootstrap-chroot \
     --buildsrpm \
     --resultdir="${MOCK_DIR_SPKG}" \
@@ -183,6 +192,7 @@ rm -rf "${MOCK_DIR_SPKG}"
 echo '***** Building binary package' >&2
 MOCK_DIR_PKG=$(mktemp -d)
 mock -r "${MOCK_CFG}" -v \
+    "${MOCK_PARAMS}" \
     --bootstrap-chroot \
     --rebuild "${BUILD_DIR}/src/${SRPM}" \
     --resultdir="${MOCK_DIR_PKG}" \
