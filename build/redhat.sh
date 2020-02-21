@@ -17,6 +17,7 @@ elif [ "${DISTRO}" = 'centos8' ]; then
     DIST_TAG='el8'
     GEMFILE_LOCK='CentOS8'
 elif [ "${DISTRO}" = 'fedora31' ]; then
+    TEMPLATES='centos8'
     MOCK_CFG='fedora-31-x86_64'
     MOCK_PARAMS='--use-bootstrap-image'
     DIST_TAG='fc31'
@@ -34,6 +35,7 @@ URL="$1"
 PKG_VERSION=${2:-1}
 
 SPEC='opennebula.spec'
+TEMPLATES=${TEMPLATES:-${DISTRO}}
 BUILD_DIR=$(mktemp -d)
 BUILD_DIR_SPKG=$(mktemp -d)
 PACKAGES_DIR="${PWD}"
@@ -60,7 +62,7 @@ fi
 # Get all sources
 ################################################################################
 
-cp "templates/${DISTRO}"/* "${BUILD_DIR_SPKG}"
+cp "templates/${TEMPLATES}"/* "${BUILD_DIR_SPKG}"
 
 cd "${BUILD_DIR_SPKG}"
 
@@ -152,7 +154,7 @@ m4 -D_VERSION_="${VERSION}" \
     -D_DATE_="${DATE}" \
     -D_RUBYGEMS_REQ_="${RUBYGEMS_REQ}" \
     ${_BUILD_COMPONENTS_UC:+ -D_WITH_${_BUILD_COMPONENTS_UC//[[:space:]]/_ -D_WITH_}_} \
-    "${DISTRO}.spec.m4" >"${SPEC}"
+    "${SPEC}.spec.m4" >"${SPEC}"
 
 ################################################################################
 # Build the package
@@ -219,6 +221,8 @@ tar -czf "${BASE_NAME}.tar.gz" \
 rm -rf ~/tar
 mkdir -p ~/tar
 cp -f "${BASE_NAME}.tar.gz" ~/tar
+
+echo 'Tar archive with packages created in ~/tar' >&2
 
 ################################################################################
 # Cleanups
