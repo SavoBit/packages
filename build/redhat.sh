@@ -106,8 +106,8 @@ if [[ "${BUILD_COMPONENTS}" =~ rubygems ]]; then
     MOCK_DIR_GEMS=$(mktemp -d)
 
     # build Ruby gems
-    mock -r "${MOCK_CFG}" "${MOCK_PARAMS}" --bootstrap-chroot --init
-    mock -r "${MOCK_CFG}" "${MOCK_PARAMS}" --bootstrap-chroot --install yum
+    mock -r "${MOCK_CFG}" ${MOCK_PARAMS} --bootstrap-chroot --init
+    mock -r "${MOCK_CFG}" ${MOCK_PARAMS} --bootstrap-chroot --install yum
 
     _MOCK_BIND_MOUNTS="[ \
 ('${PACKAGES_DIR}',   '/data/packages'), \
@@ -116,7 +116,7 @@ if [[ "${BUILD_COMPONENTS}" =~ rubygems ]]; then
 ]"
 
     mock -r "${MOCK_CFG}" \
-        "${MOCK_PARAMS}" \
+        ${MOCK_PARAMS} \
         --bootstrap-chroot \
         --enable-network \
         --enable-plugin=bind_mount \
@@ -163,13 +163,13 @@ m4 -D_VERSION_="${VERSION}" \
 _BUILD_COMPONENTS_LC=${BUILD_COMPONENTS,,}
 _WITH_COMPONENTS=${_BUILD_COMPONENTS_LC:+ --with ${_BUILD_COMPONENTS_LC//[[:space:]]/ --with }}
 
-mock -r "${MOCK_CFG}" "${MOCK_PARAMS}" --bootstrap-chroot --init
+mock -r "${MOCK_CFG}" ${MOCK_PARAMS} --bootstrap-chroot --init
 
 # build source package
 echo '***** Building source package' >&2
 MOCK_DIR_SPKG=$(mktemp -d)
 mock -r "${MOCK_CFG}" -v \
-    "${MOCK_PARAMS}" \
+    ${MOCK_PARAMS} \
     --bootstrap-chroot \
     --buildsrpm \
     --resultdir="${MOCK_DIR_SPKG}" \
@@ -194,7 +194,7 @@ rm -rf "${MOCK_DIR_SPKG}"
 echo '***** Building binary package' >&2
 MOCK_DIR_PKG=$(mktemp -d)
 mock -r "${MOCK_CFG}" -v \
-    "${MOCK_PARAMS}" \
+    ${MOCK_PARAMS} \
     --bootstrap-chroot \
     --rebuild "${BUILD_DIR}/src/${SRPM}" \
     --resultdir="${MOCK_DIR_PKG}" \
