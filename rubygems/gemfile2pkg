@@ -42,8 +42,7 @@ def setup_fpm(build_dir)
     STDERR.puts 'Installing fpm'
     fpm_install = 'gem',
                   'install',
-                  '--no-ri',
-                  '--no-rdoc',
+                  '--no-document',
                   '--install-dir', "#{build_dir}/fpm",
                   '--bindir', "#{build_dir}/fpm/bin",
                   'fpm'
@@ -171,8 +170,7 @@ def pack_gem(gem, build_dir, fpm_path)
                         'install',
                         '--install-dir', "#{build_dir}/gems",
                         '--ignore-dependencies',
-                        '--no-ri',
-                        '--no-rdoc',
+                        '--no-document',
                         '-f',
                         '-v', gem[:version],
                         gem[:name]
