@@ -154,7 +154,7 @@ m4 -D_VERSION_="${VERSION}" \
     -D_DATE_="${DATE}" \
     -D_RUBYGEMS_REQ_="${RUBYGEMS_REQ}" \
     ${_BUILD_COMPONENTS_UC:+ -D_WITH_${_BUILD_COMPONENTS_UC//[[:space:]]/_ -D_WITH_}_} \
-    "${SPEC}.spec.m4" >"${SPEC}"
+    "${SPEC}.m4" >"${SPEC}"
 
 ################################################################################
 # Build the package
