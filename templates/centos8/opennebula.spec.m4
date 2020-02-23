@@ -35,7 +35,7 @@
 %if 0%{?fedora} >= 31
     %define with_oca_java_prebuilt 1
     %define scons            scons-3
-    #TODO: gemfile lock
+    %define gemfile_lock     Fedora31
 
     # don't mangle shebangs (e.g., fix /usr/bin/env ruby -> /usr/bin/ruby)
     %global __brp_mangle_shebangs_exclude_from ^\/var\/lib\/one\/remotes\/
